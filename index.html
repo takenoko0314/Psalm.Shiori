@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>詩篇の栞</title>
+  <style>
+    :root {
+      --green: #008000; --red: #dc143c; --lightblue: #87cefa; --pink: #ff69b4;
+      --blue: #4169e1; --yellow: #ffd700; --lime: #9acd32; --brown: #a0522d;
+      --orange: #ff8c00; --purple: #4b0082; --gray: #808080;
+    }
+
+    body {
+      margin: 0;
+      padding-bottom: 300px;
+      background: beige;
+      font-family: sans-serif;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin: 40px 0 20px;
+    }
+
+    .category-button {
+      display: block;
+      margin: 10px auto;
+      padding: 15px;
+      width: 90%;
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .psalm-buttons {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 1.2s ease, opacity 1.2s ease;
+    }
+
+    .psalm-buttons.show {
+      opacity: 1;
+      margin-bottom: 20px;
+    }
+
+    .psalm-button {
+      display: block;
+      margin: 8px auto;
+      padding: 12px 20px;
+      width: 90%;
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      white-space: normal;
+      line-height: 1.4;
+    }
+
+    .psalm-button span {
+      display: block;
+    }
+
+    .close-button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      width: 40%;
+      font-size: 16px;
+      background: #444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 1s ease, fadeOut 1s ease 2.5s forwards;
+    }
+
+    #splash img {
+      max-height: 100vh;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; visibility: hidden; }
+    }
+  </style>
+</head>
+<body>
+  <div id="splash">
+    <img src="splash.jpg" alt="スプラッシュ画像" />
+  </div>
+
+  <h1>詩篇の栞</h1>
+  <div id="categories"></div>
+
+  <script>
+    const colors = {
+      thanks: "#008000", anger: "#dc143c", lament: "#87cefa", victory: "#ff69b4",
+      repent: "#4169e1", praise: "#ffd700", trust: "#9acd32", wisdom: "#a0522d",
+      loyalty: "#ff8c00", king: "#4b0082", zion: "#808080"
+    };
+
+    const psalms = {
+      thanks:[{n:21,t:"あなたの御力を王は喜びます",cats:['thanks']},
+        {n:30,t:"嘆きを踊りに変えてくださいました",cats:['thanks']},
+        {n:34,t:"主を仰ぎ見ると、彼らは輝いた",cats:['thanks']},
+        {n:40,t:"数えきれない災いが私を取り囲んでいる",cats:['thanks','lament']},
+        {n:75,t:"ある者を低くし、ある者を高く上げられる",cats:['thanks']},
+        {n:92,t:"あなたの御手のわざを私は喜び歌います",cats:['thanks']},
+        {n:107,t:"主の数々の恵みを見極めよ",cats:['thanks']},
+        {n:108,t:"琴よ、竪琴よ、目を覚ませ",cats:['thanks']},
+        {n:111,t:"主は御民のために贖いを送り",cats:['thanks']},
+        {n:116,t:"私は救いの杯を掲げ",cats:['thanks']},
+        {n:136,t:"主の恵みはとこしえまで",cats:['thanks']},
+        {n:138,t:"私が呼んだその日に、あなたは私に答え",cats:['thanks']}],
+
+anger:[{n:12,t:"悪しき者がいたるところで横行します",cats:['anger']},
+       {n:58,t:"まことに、さばく神が地におられる",cats:['anger']},
+       {n:79,t:"国々はあなたのゆずりの地に侵入し",cats:['anger']},
+       {n:109,t:"彼らは善に代えて悪を…私に返しました",cats:['anger']},
+       {n:137,t:"街中の柳の木々に私たちは竪琴を掛けた",cats:['anger']}],
+
+lament:[{n:3,t:"私に向かい立つ者が多くいる",cats:['lament']},
+        {n:5,t:"彼らの喉は開いた墓",cats:['lament']},
+        {n:7,t:"追い迫るすべての者から…助け出して",cats:['lament']},
+        {n:9,t:"私はあなたを喜び、誇ります",cats:['lament']},
+        {n:10,t:"なぜ、あなたは遠く離れて立ち",cats:['lament']},
+        {n:13,t:"私を永久にお忘れになるのですか",cats:['lament']},
+        {n:14,t:"愚か者は心の中で「神はいない」と言う",cats:['lament']},
+        {n:17,t:"瞳のように私を守り",cats:['lament']},
+        {n:22,t:"どうして私をお見捨てになったのですか",cats:['lament','thanks']},
+        {n:25,t:"私はあなたを一日中待ち望みます",cats:['lament']},
+        {n:26,t:"私を弁護してください",cats:['lament']},
+        {n:28,t:"私を引いて行かないでください",cats:['lament']},
+        {n:31,t:"私の霊をあなたの御手にゆだねます",cats:['lament','praise']},
+        {n:35,t:"私と戦う者と戦ってください",cats:['lament']},
+        {n:39,t:"私はひたすら黙っていた",cats:['lament']},
+        {n:42,t:"鹿が谷川の流れを慕いあえぐように",cats:['lament']},
+        {n:43,t:"我が魂よ、なぜ、お前はうなだれているのか",cats:['lament']},
+        {n:44,t:"あなたのために私たちは休みなく殺され",cats:['lament']},
+        {n:52,t:"勇士よ、なぜお前は悪を誇りとするのか",cats:['lament']},
+        {n:53,t:"彼らは恐れのないところで大いに恐れた",cats:['lament']},
+        {n:54,t:"あなたの御名によって私をお救いください",cats:['lament']},
+        {n:55,t:"ああ、私に鳩のような翼があったなら",cats:['lament']},
+        {n:56,t:"心に恐れを覚える日…あなたに信頼します",cats:['lament']},
+        {n:57,t:"私は暁を呼び覚まそう",cats:['lament']},
+        {n:59,t:"神が私の砦",cats:['lament']},
+        {n:60,t:"あなたは御民を苦しい目にあわせ",cats:['lament']},
+        {n:61,t:"及びがたいほど高い岩の上に私を導いて",cats:['lament']},
+        {n:64,t:"敵の脅しから私の命を守ってください",cats:['lament']},
+        {n:69,t:"水が喉にまで入って来ました",cats:['lament']},
+        {n:71,t:"私は生まれた時からあなたに抱かれています",cats:['lament']},
+        {n:74,t:"神よ、なぜ、いつまでも拒み",cats:['lament','praise']},
+        {n:77,t:"私の心は乱れて、もの言うこともできません",cats:['lament']},
+        {n:80,t:"涙のパン",cats:['lament']},
+        {n:83,t:"神よ、沈黙していないでください",cats:['lament']},
+        {n:85,t:"栄光が私たちの地に留まるためです",cats:['lament']},
+        {n:86,t:"苦難の日に、私はあなたを呼び求めます",cats:['lament']},
+        {n:88,t:"私の魂は苦しみに満ち",cats:['lament']},
+        {n:94,t:"いつまでですか、悪き者が勝ち誇るのは",cats:['lament']},
+        {n:106,t:"彼らはすぐに、みわざを忘れ",cats:['lament']},
+        {n:120,t:"平和を憎む者",cats:['lament']},
+        {n:123,t:"高ぶる者たちの蔑みでいっぱいです",cats:['lament']},
+        {n:140,t:"高ぶる者は、私に罠を仕掛け",cats:['lament']},
+        {n:141,t:"私の祈りが、御前への香として",cats:['lament']},
+        {n:142,t:"私の霊が私のうちで衰え果てたときにも",cats:['lament']}],
+
+victory:[{n:18,t:"あなたは、恵み深い者には恵み深く",cats:['victory']},
+         {n:20,t:"私たちはあなたの勝利を喜び歌い",cats:['victory']},
+         {n:68,t:"正しい者たちは小躍りして喜ぶ",cats:['victory']},
+         {n:118,t:"これは主が設けられた日",cats:['victory']},
+         {n:124,t:"もしも主が私たちの味方でなかったなら",cats:['victory']},
+         {n:129,t:"彼らは私が若い頃から酷く私を苦しめた",cats:['victory']}],
+
+repent:[{n:6,t:"私の魂は、ひどく恐れおののいています",cats:['repent']},
+        {n:32,t:"私の罪のとがめを赦してくださいました",cats:['repent']},
+        {n:38,t:"自分の罪で不安なのです",cats:['repent']},
+        {n:51,t:"神よ、私にきよい心を造り",cats:['repent']},
+        {n:102,t:"飲み物に涙を混ぜ合わせました",cats:['repent']},
+        {n:130,t:"深い淵から私はあなたを呼び求めます",cats:['repent']},
+        {n:143,t:"あなたのしもべをさばきにかけないで",cats:['repent']}],
+
+praise:[{n:8,t:"あなたの指のわざである、あなたの天",cats:['praise']},
+        {n:15,t:"だれがあなたの幕屋に宿るのでしょうか",cats:['praise']},
+        {n:19,t:"天は神の栄光を語り告げ",cats:['praise','wisdom']},
+        {n:24,t:"栄光の王が入って来られる",cats:['praise']},
+        {n:29,t:"主はとこしえに王座に着いておられる",cats:['praise']},
+        {n:33,t:"主が仰られると、そのようになり",cats:['praise']},
+        {n:47,t:"全地を治める、大いなる王",cats:['praise']},
+        {n:65,t:"祈りを聞かれる方よ",cats:['praise']},
+        {n:66,t:"神が私の魂になさったことを語ろう",cats:['praise']},
+        {n:67,t:"御救いがすべての国々の間で知られる",cats:['praise']},
+        {n:89,t:"いつまでですか。主よ。",cats:['praise','lament']},
+        {n:93,t:"あなたの御座は、いにしえから堅く立ち",cats:['praise']},
+        {n:95,t:"地の深みは御手のうちにあり",cats:['praise']},
+        {n:96,t:"主の栄光を国々の間で語り告げよ",cats:['praise']},
+        {n:97,t:"全地の上におられる、いと高き方",cats:['praise']},
+        {n:98,t:"地の果てのすべての者が…神の救いを見ている",cats:['praise']},
+        {n:99,t:"王は力をもって、さばきを愛する",cats:['praise']},
+        {n:100,t:"主が私たちを造られた。私たちは主のもの",cats:['praise']},
+        {n:103,t:"あなたの若さは鷲のように新しくなる",cats:['praise']},
+        {n:104,t:"あなたは知恵をもってそれらをみな造られ",cats:['praise']},
+        {n:105,t:"絶えず御顔を慕い求めよ",cats:['praise']},
+        {n:113,t:"貧しい人をあくたから引き上げ",cats:['praise']},
+        {n:114,t:"どうしたことか。海よ、お前が逃げ去るとは",cats:['praise']},
+        {n:115,t:"天と地を造られた方、主によって",cats:['praise']},
+        {n:117,t:"すべての国民よ、主をほえ歌え",cats:['praise']},
+        {n:134,t:"夜ごとに主の家で仕える者たちよ",cats:['praise']},
+        {n:135,t:"私たちの神の家の大庭で仕える者よ",cats:['praise']},
+        {n:139,t:"そこでも、あなたの御手が私を導き",cats:['praise']},
+        {n:145,t:"すべての目はあなたを待ち望んでいます",cats:['praise']},
+        {n:146,t:"私は生きている限り主をほめたたえる",cats:['praise']},
+        {n:147,t:"主は地に仰せのことばを送り",cats:['praise']},
+        {n:148,t:"主が命じて、それらは創造されたのだ",cats:['praise']},
+        {n:149,t:"自らの造り主にあって喜べ",cats:['praise']},
+        {n:150,t:"大能のみわざのゆえに、神をほめたたえよ",cats:['praise']}],
+
+trust:[{n:4,t:"平安のうちに私は…すぐ眠りにつきます",cats:['trust']},
+       {n:11,t:"拠り所が壊されたら",cats:['trust']},
+       {n:16,t:"満ち足りた喜びが、あなたの御前にあり",cats:['trust']},
+       {n:23,t:"主は私の羊飼い",cats:['trust']},
+       {n:27,t:"主は私の光…だれを私は恐れよう",cats:['trust','lament']},
+       {n:41,t:"敵は私に向かって勝ちどきをあげません",cats:['trust']},
+       {n:62,t:"私の魂は黙って、ただ神を待ち望む",cats:['trust']},
+       {n:63,t:"私の魂はあなたに渇き",cats:['trust','praise']},
+       {n:73,t:"私は絶えずあなたとともに",cats:['trust']},
+       {n:90,t:"教えてください。自分の日を数えることを",cats:['trust']},
+       {n:91,t:"私の避け所、私の砦",cats:['trust']},
+       {n:121,t:"私は山に向かって目を上げる",cats:['trust']},
+       {n:125,t:"主に信頼する人々はシオンの山のようだ",cats:['trust']},
+       {n:126,t:"涙とともに種を蒔く者は",cats:['trust']},
+       {n:131,t:"乳離れした子が母親とともにいるように",cats:['trust']}],
+
+wisdom:[{n:1,t:"その人は流れのほとりに植えられた木",cats:['wisdom']},
+        {n:36,t:"あなたの光のうちに私たちは光を見る",cats:['wisdom','praise','lament']},
+        {n:37,t:"悪を行う者に腹を立てるな",cats:['wisdom']},
+        {n:49,t:"人は栄華のうちに留まれない",cats:['wisdom']},
+        {n:78,t:"私の口は開いて、たとえ話を",cats:['wisdom']},
+        {n:112,t:"直ぐな人たちのために光は闇の中に輝き昇る",cats:['wisdom']},
+        {n:119,t:"どれほど私はあなたのみおしえを愛して",cats:['wisdom']},
+        {n:127,t:"胎の実は報酬",cats:['wisdom']},
+        {n:128,t:"それはあなたの幸い、あなたへの恵み",cats:['wisdom']},
+        {n:133,t:"兄弟たちが一つになって共に生きることは",cats:['wisdom']}],
+
+loyalty:[{n:50,t:"生贄のことであなたを責めるのではない",cats:['loyalty']},
+         {n:70,t:"神よ、私のところに急いでください",cats:['loyalty']},
+         {n:81,t:"わたしの言うことをよく聞け",cats:['loyalty']},
+         {n:82,t:"すべての国々を、ご自分のものとして",cats:['loyalty']}],
+
+king:[{n:2,t:"あなたはわたしの子",cats:['king']},
+      {n:45,t:"あなたの王座は世々限りなく",cats:['king']},
+      {n:72,t:"あなたの義を王の子に与えてください",cats:['king']},
+      {n:101,t:"恵みとさばきを私は歌います",cats:['king']},
+      {n:110,t:"メルキゼデクの例に倣いとこしえに祭司",cats:['king']},
+      {n:132,t:"彼のすべての苦しみを思い出してください",cats:['king']},
+      {n:144,t:"私を解き放ち、救い出してください",cats:['king']}],
+
+zion:[{n:46,t:"神はわれらの避け所、また力",cats:['zion']},
+      {n:48,t:"大王の都",cats:['zion']},
+      {n:76,t:"恐るべき方に贈り物を献げよ",cats:['zion']},
+      {n:84,t:"あなたの大庭にいる一日は千日にまさり",cats:['zion']},
+      {n:87,t:"主の礎は聖なる山にある",cats:['zion']},
+      {n:122,t:"エルサレムの平和のために祈れ",cats:['zion']}]
+};
+
+    const container = document.getElementById("categories");
+
+    const wrappers = {};
+
+    Object.keys(psalms).forEach(category => {
+      const btn = document.createElement("button");
+      btn.className = "category-button";
+      btn.style.backgroundColor = colors[category];
+      btn.textContent = getCategoryName(category);
+      container.appendChild(btn);
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "psalm-buttons";
+      container.appendChild(wrapper);
+      wrappers[category] = wrapper;
+
+      let isOpen = false;
+
+      btn.addEventListener("click", () => {
+        const isAlreadyOpen = wrapper.classList.contains("show");
+
+        Object.keys(wrappers).forEach(key => {
+          if (wrappers[key].classList.contains("show")) {
+            wrappers[key].style.maxHeight = "0px";
+            wrappers[key].classList.remove("show");
+          }
+        });
+
+        if (isAlreadyOpen) {
+          return;
+        }
+
+        wrapper.innerHTML = "";
+
+        psalms[category].forEach(p => {
+          const b = document.createElement("button");
+          b.className = "psalm-button";
+          b.innerHTML = `<span>詩篇${p.n}</span><span>${p.t}</span>`;
+          b.onclick = () =>
+            window.open(`https://www.bible.com/ja/bible/1819/PSA.${p.n}.%2525E6%252596%2525B0%2525E5%252585%2525B1%2525E5%252590%25258C%2525E8%2525A8%2525B3`, "_blank");
+          b.style.background = getGradient(p.cats);
+          wrapper.appendChild(b);
+        });
+
+        const closeBtn = document.createElement("button");
+        closeBtn.className = "close-button";
+        closeBtn.textContent = "閉じる";
+        closeBtn.onclick = () => {
+          wrapper.style.maxHeight = "0px";
+          wrapper.classList.remove("show");
+        };
+        wrapper.appendChild(closeBtn);
+
+        wrapper.classList.add("show");
+        wrapper.style.maxHeight = wrapper.scrollHeight + "px";
+      });
+    });
+
+    function getCategoryName(key) {
+      const map = {
+        thanks: "感謝の詩篇", anger: "怒りの詩篇", lament: "嘆きの祈り", victory: "勝利の詩篇",
+        repent: "悔い改めの詩篇", praise: "賛美の祈り", trust: "信頼の詩篇",
+        wisdom: "知恵の詩篇", loyalty: "忠誠を誓う詩篇", king: "王の詩篇", zion: "神の都の詩篇"
+      };
+      return map[key] || key;
+    }
+
+function getGradient(cats) {
+  const valid = cats.map(c => colors[c]).filter(Boolean);
+  if (valid.length === 1) return valid[0];
+  if (valid.length === 2)
+    return `linear-gradient(to right, ${valid[0]} 0%, ${valid[1]} 100%)`;
+  if (valid.length === 3)
+    return `linear-gradient(to right, ${valid[0]} 0%, ${valid[1]} 50%, ${valid[2]} 100%)`;
+  return valid[0];
+}
+  </script>
+</body>
+</html>
