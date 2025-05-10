@@ -325,7 +325,7 @@ zion:[{n:46,t:"神はわれらの避け所、また力",cats:['zion']},
           b.className = "psalm-button";
           b.innerHTML = `<span>詩篇${p.n}</span><span>${p.t}</span>`;
           b.onclick = () =>
-            window.open(`https://www.bible.com/ja/bible/1819/PSA.${p.n}.%2525E6%252596%2525B0%2525E5%252585%2525B1%2525E5%252590%25258C%2525E8%2525A8%2525B3`, "_blank");
+            window.open(`https://www.bible.or.jp/read/bible/bibleSearchForm.html?book=19&chapter=${p.n}&verse=1`, "_blank");
           b.style.background = getGradient(p.cats);
           wrapper.appendChild(b);
         });
