@@ -110,7 +110,8 @@
   justify-content: center;
   overflow: hidden;
   z-index: 1000;
-  animation: fadeIn 1s ease, fadeOut 1s ease 2.5s forwards;
+  opacity: 1;
+  animation: splashOut 1s ease 2.5s forwards;
 }
 
 #splash img {
@@ -118,17 +119,26 @@
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+  opacity: 0;
+  animation: imageIn 1s ease forwards;
 }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+@keyframes imageIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; visibility: hidden; }
-    }
+@keyframes splashOut {
+  from {
+    opacity: 1;
+    visibility: visible;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
   </style>
 </head>
 <body>
