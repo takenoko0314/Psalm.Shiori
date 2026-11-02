@@ -374,15 +374,44 @@ zion:[{n:46,t:"神はわれらの避け所、また力",cats:['zion']},
         closeBtn.className = "close-button";
         closeBtn.textContent = "閉じる";
         
+
 closeBtn.onclick = () => {
-  const previousScrollY = window.scrollY;
+  if (wrapper.dataset.closing === "true") return;
+  wrapper.dataset.closing = "true";
+
+  const startY = window.scrollY;
+  const targetY = Math.max(
+    0,
+    startY - wrapper.offsetHeight
+  );
+
+  const duration = 1200;
+  const startTime = performance.now();
 
   wrapper.style.maxHeight = "0px";
   wrapper.classList.remove("show");
 
-  requestAnimationFrame(() => {
-    window.scrollTo(0, previousScrollY);
-  });
+  function animateScroll(now) {
+    const progress = Math.min(
+      (now - startTime) / duration,
+      1
+    );
+
+    const eased = 1 - Math.pow(1 - progress, 3);
+
+    window.scrollTo(
+      0,
+      startY + (targetY - startY) * eased
+    );
+
+    if (progress < 1) {
+      requestAnimationFrame(animateScroll);
+    } else {
+      wrapper.dataset.closing = "false";
+    }
+  }
+
+  requestAnimationFrame(animateScroll);
 };
 
         wrapper.appendChild(closeBtn);
