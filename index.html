@@ -98,22 +98,27 @@
       cursor: pointer;
     }
 
-    #splash {
-      position: fixed;
-      inset: 0;
-      background: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      animation: fadeIn 1s ease, fadeOut 1s ease 2.5s forwards;
-    }
+#splash {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 1000;
+  animation: fadeIn 1s ease, fadeOut 1s ease 2.5s forwards;
+}
 
-    #splash img {
-      max-height: 100vh;
-      max-width: 100%;
-      object-fit: contain;
-    }
+#splash img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
 
     @keyframes fadeIn {
       from { opacity: 0; }
