@@ -373,10 +373,18 @@ zion:[{n:46,t:"神はわれらの避け所、また力",cats:['zion']},
         const closeBtn = document.createElement("button");
         closeBtn.className = "close-button";
         closeBtn.textContent = "閉じる";
-        closeBtn.onclick = () => {
-          wrapper.style.maxHeight = "0px";
-          wrapper.classList.remove("show");
-        };
+        
+closeBtn.onclick = () => {
+  const previousScrollY = window.scrollY;
+
+  wrapper.style.maxHeight = "0px";
+  wrapper.classList.remove("show");
+
+  requestAnimationFrame(() => {
+    window.scrollTo(0, previousScrollY);
+  });
+};
+
         wrapper.appendChild(closeBtn);
 
         wrapper.classList.add("show");
